@@ -693,8 +693,7 @@
               </div>
               <div class="field">
                 <label for="f-zona">Colonia</label>
-                <input id="f-zona" name="zona" type="text" list="dl-colonias" maxlength="60" placeholder="Escribe o elige tu colonia" required>
-                <datalist id="dl-colonias"></datalist>
+                <input id="f-zona" name="zona" type="text" maxlength="60" placeholder="Escribe tu colonia" required>
               </div>
               <div class="field full">
                 <label for="f-desc">Cuéntanos qué pasó</label>
@@ -1056,41 +1055,8 @@
     if(selCat.querySelector('option[value="' + prev + '"]')) selCat.value = prev;
   }
 
-  // ---- Autorrelleno por código postal (archivos estáticos cp/NN.json) ----
-  var cpCache = {}, colAuto = false;
-  inpCol.addEventListener('input', function(){ colAuto = false; });
-  function cargarPrefijo(pref){
-    if(cpCache[pref]) return cpCache[pref];
-    cpCache[pref] = fetch('cp/' + pref + '.json').then(function(r){ if(!r.ok) throw new Error('x'); return r.json(); });
-    cpCache[pref].catch(function(){ delete cpCache[pref]; });
-    return cpCache[pref];
-  }
-  function aplicarCp(entrada){
-    var estado = ESTADOS[entrada[0]] || '';
-    var mun = entrada[1] || '';
-    var cols = entrada[2] || [];
-    selEstado.value = estado;
-    ajustarMunicipio();
-    if(estado === 'Ciudad de México'){ selAlc.value = ALCALDIAS.indexOf(mun) !== -1 ? mun : ''; }
-    else { inpMun.value = mun; }
-    dlCol.innerHTML = '';
-    cols.forEach(function(c){ var o = document.createElement('option'); o.value = c; dlCol.appendChild(o); });
-    if(colAuto || !inpCol.value.trim()){ inpCol.value = cols.length === 1 ? cols[0] : ''; colAuto = cols.length === 1; }
-    cpHint.textContent = '✓ ' + mun + ', ' + estado + (cols.length > 1 ? ' · elige tu colonia' : '');
-  }
-  inpCp.addEventListener('input', function(){
-    inpCp.value = inpCp.value.replace(/\D/g, '').slice(0, 5);
-    cpHint.textContent = '';
-    if(inpCp.value.length !== 5) return;
-    var cp = inpCp.value;
-    cargarPrefijo(cp.slice(0, 2)).then(function(datos){
-      if(inpCp.value !== cp) return; // ya cambió
-      if(datos[cp]) aplicarCp(datos[cp]);
-      else cpHint.textContent = 'No encontramos ese código. Llena estado, municipio y colonia a mano.';
-    }).catch(function(){
-      if(inpCp.value === cp) cpHint.textContent = 'Llena estado, municipio y colonia a mano.';
-    });
-  });
+  // El código postal solo acepta números (sin consultas externas).
+  inpCp.addEventListener('input', function(){ inpCp.value = inpCp.value.replace(/\D/g, '').slice(0, 5); });
 
   var cerradoBox = document.getElementById('req-closed');
   function mostrarCerrado(est){
