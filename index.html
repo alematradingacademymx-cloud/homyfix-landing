@@ -673,18 +673,28 @@
                   <option value="Sin prisa">Sin prisa</option>
                 </select>
               </div>
-              <div class="field" id="box-estado">
-                <label for="f-estado">Tu estado</label>
+              <div class="field full">
+                <label for="f-calle">Tu dirección: calle y número</label>
+                <input id="f-calle" name="calle" type="text" maxlength="100" autocomplete="address-line1" placeholder="Ej. Calle Durango 123, depto 4" required>
+              </div>
+              <div class="field">
+                <label for="f-cp">Código postal</label>
+                <input id="f-cp" name="cp" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="5 dígitos" required>
+                <span class="hint" id="f-cp-hint"></span>
+              </div>
+              <div class="field">
+                <label for="f-estado">Estado</label>
                 <select id="f-estado" name="estado"></select>
               </div>
-              <div class="field" id="box-alc">
-                <label for="f-alc">Tu alcaldía</label>
+              <div class="field">
+                <label for="f-alc" id="lbl-mun">Alcaldía o municipio</label>
                 <select id="f-alc" name="alcaldia"></select>
+                <input id="f-mun" name="municipio" type="text" maxlength="60" placeholder="Tu municipio" style="display:none">
               </div>
-              <div class="field full" id="box-col">
-                <label for="f-colsel" id="lbl-col">Tu colonia</label>
-                <select id="f-colsel" style="display:none"></select>
-                <input id="f-zona" name="zona" type="text" maxlength="60" placeholder="Escribe tu colonia" required>
+              <div class="field">
+                <label for="f-zona">Colonia</label>
+                <input id="f-zona" name="zona" type="text" list="dl-colonias" maxlength="60" placeholder="Escribe o elige tu colonia" required>
+                <datalist id="dl-colonias"></datalist>
               </div>
               <div class="field full">
                 <label for="f-desc">Cuéntanos qué pasó</label>
@@ -1012,58 +1022,75 @@
 
   var ESTADOS = ["Aguascalientes","Baja California","Baja California Sur","Campeche","Chiapas","Chihuahua","Ciudad de México","Coahuila","Colima","Durango","Estado de México","Guanajuato","Guerrero","Hidalgo","Jalisco","Michoacán","Morelos","Nayarit","Nuevo León","Oaxaca","Puebla","Querétaro","Quintana Roo","San Luis Potosí","Sinaloa","Sonora","Tabasco","Tamaulipas","Tlaxcala","Veracruz","Yucatán","Zacatecas"];
   var ALCALDIAS = ["Álvaro Obregón","Azcapotzalco","Benito Juárez","Coyoacán","Cuajimalpa de Morelos","Cuauhtémoc","Gustavo A. Madero","Iztacalco","Iztapalapa","La Magdalena Contreras","Miguel Hidalgo","Milpa Alta","Tláhuac","Tlalpan","Venustiano Carranza","Xochimilco"];
-  var OTRO_ESTADO = 'Otro estado', OTRA_ALC = 'Otra alcaldía', OTRA_COL = 'Mi colonia no aparece';
-  var cobertura = {estados: [], cdmx: {}};
+  var cobertura = {estados: [], cdmx: {}, cps: [], oficios: []};
   var selEstado = document.getElementById('f-estado'), selAlc = document.getElementById('f-alc'),
-      selCol = document.getElementById('f-colsel'), inpCol = document.getElementById('f-zona'),
-      boxAlc = document.getElementById('box-alc'), lblCol = document.getElementById('lbl-col');
+      inpMun = document.getElementById('f-mun'), inpCol = document.getElementById('f-zona'),
+      inpCp = document.getElementById('f-cp'), cpHint = document.getElementById('f-cp-hint'),
+      dlCol = document.getElementById('dl-colonias'), lblMun = document.getElementById('lbl-mun'),
+      selCat = document.getElementById('f-cat');
 
-  function opciones(sel, lista, valorActual){
+  function opciones(sel, lista, placeholder){
     sel.innerHTML = '';
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = placeholder; sel.appendChild(o0);
     lista.forEach(function(v){ var o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
-    if(valorActual && lista.indexOf(valorActual) !== -1) sel.value = valorActual;
   }
-  function renderEstados(){
-    var prev = selEstado.value;
-    var lista = cobertura.estados.length ? cobertura.estados.concat([OTRO_ESTADO]) : ESTADOS.slice();
-    opciones(selEstado, lista, prev || 'Ciudad de México');
-    if(!selEstado.value || lista.indexOf(selEstado.value) === -1) selEstado.value = lista[0];
-    renderAlcaldias();
-  }
-  function renderAlcaldias(){
+  opciones(selEstado, ESTADOS, 'Elige tu estado');
+  opciones(selAlc, ALCALDIAS, 'Elige tu alcaldía');
+
+  function ajustarMunicipio(){
     var esCdmx = selEstado.value === 'Ciudad de México';
-    boxAlc.style.display = esCdmx ? '' : 'none';
-    if(esCdmx){
-      var activas = Object.keys(cobertura.cdmx);
-      var lista = activas.length ? activas.concat([OTRA_ALC]) : ALCALDIAS.slice();
-      opciones(selAlc, lista, selAlc.value);
-    }
-    renderColonias();
+    selAlc.style.display = esCdmx ? '' : 'none';
+    inpMun.style.display = esCdmx ? 'none' : '';
+    lblMun.textContent = esCdmx ? 'Alcaldía' : 'Municipio';
   }
-  function renderColonias(){
-    var esCdmx = selEstado.value === 'Ciudad de México';
-    var lista = esCdmx ? (cobertura.cdmx[selAlc.value] || []) : [];
-    if(esCdmx && lista.length){
-      opciones(selCol, lista.concat([OTRA_COL]), selCol.value);
-      selCol.style.display = '';
-      inpCol.style.display = selCol.value === OTRA_COL ? '' : 'none';
-      lblCol.textContent = 'Tu colonia';
-      inpCol.placeholder = 'Escribe el nombre de tu colonia';
-    } else {
-      selCol.style.display = 'none';
-      inpCol.style.display = '';
-      lblCol.textContent = esCdmx ? 'Tu colonia' : 'Tu ciudad y colonia';
-      inpCol.placeholder = esCdmx ? 'Escribe tu colonia' : 'Ej. Guadalajara, colonia Americana';
-    }
+  selEstado.addEventListener('change', ajustarMunicipio);
+  ajustarMunicipio();
+
+  // Oficios disponibles: si el admin eligió algunos, solo se muestran esos.
+  function filtrarOficios(){
+    if(!cobertura.oficios || !cobertura.oficios.length) return;
+    var prev = selCat.value;
+    Array.prototype.slice.call(selCat.options).forEach(function(o){
+      if(cobertura.oficios.indexOf(o.value) === -1) selCat.removeChild(o);
+    });
+    if(selCat.querySelector('option[value="' + prev + '"]')) selCat.value = prev;
   }
-  function valorColonia(){
-    if(selCol.style.display !== 'none' && selCol.value !== OTRA_COL) return selCol.value;
-    return inpCol.value.trim();
+
+  // ---- Autorrelleno por código postal (archivos estáticos cp/NN.json) ----
+  var cpCache = {}, colAuto = false;
+  inpCol.addEventListener('input', function(){ colAuto = false; });
+  function cargarPrefijo(pref){
+    if(cpCache[pref]) return cpCache[pref];
+    cpCache[pref] = fetch('cp/' + pref + '.json').then(function(r){ if(!r.ok) throw new Error('x'); return r.json(); });
+    cpCache[pref].catch(function(){ delete cpCache[pref]; });
+    return cpCache[pref];
   }
-  selEstado.addEventListener('change', renderAlcaldias);
-  selAlc.addEventListener('change', renderColonias);
-  selCol.addEventListener('change', renderColonias);
-  renderEstados();
+  function aplicarCp(entrada){
+    var estado = ESTADOS[entrada[0]] || '';
+    var mun = entrada[1] || '';
+    var cols = entrada[2] || [];
+    selEstado.value = estado;
+    ajustarMunicipio();
+    if(estado === 'Ciudad de México'){ selAlc.value = ALCALDIAS.indexOf(mun) !== -1 ? mun : ''; }
+    else { inpMun.value = mun; }
+    dlCol.innerHTML = '';
+    cols.forEach(function(c){ var o = document.createElement('option'); o.value = c; dlCol.appendChild(o); });
+    if(colAuto || !inpCol.value.trim()){ inpCol.value = cols.length === 1 ? cols[0] : ''; colAuto = cols.length === 1; }
+    cpHint.textContent = '✓ ' + mun + ', ' + estado + (cols.length > 1 ? ' · elige tu colonia' : '');
+  }
+  inpCp.addEventListener('input', function(){
+    inpCp.value = inpCp.value.replace(/\D/g, '').slice(0, 5);
+    cpHint.textContent = '';
+    if(inpCp.value.length !== 5) return;
+    var cp = inpCp.value;
+    cargarPrefijo(cp.slice(0, 2)).then(function(datos){
+      if(inpCp.value !== cp) return; // ya cambió
+      if(datos[cp]) aplicarCp(datos[cp]);
+      else cpHint.textContent = 'No encontramos ese código. Llena estado, municipio y colonia a mano.';
+    }).catch(function(){
+      if(inpCp.value === cp) cpHint.textContent = 'Llena estado, municipio y colonia a mano.';
+    });
+  });
 
   var cerradoBox = document.getElementById('req-closed');
   function mostrarCerrado(est){
@@ -1086,7 +1113,7 @@
   if(API_URL && API_URL.indexOf('http') === 0){
     postForm({action:'estado_publico'}).then(function(est){
       if(est && est.ok){
-        if(est.cobertura){ cobertura = {estados: est.cobertura.estados || [], cdmx: est.cobertura.cdmx || {}}; renderEstados(); }
+        if(est.cobertura){ cobertura = est.cobertura; filtrarOficios(); }
         if(!est.abierto) mostrarCerrado(est);
         var intro = document.getElementById('tec-intro');
         if(est.fecha_arranque && intro){
@@ -1150,11 +1177,18 @@
     clearError();
     var nombre = form.nombre.value.trim();
     var tel = digits(form.telefono.value);
-    var colonia = valorColonia();
+    var colonia = inpCol.value.trim();
+    var calle = form.calle.value.trim();
+    var cp = inpCp.value.replace(/\D/g,'');
+    var mun = inpMun.value.trim();
     var desc = form.descripcion.value.trim();
     if(nombre.length < 3){ showError('Escribe tu nombre completo.'); form.nombre.focus(); return; }
     if(tel.length !== 10){ showError('Escribe tu WhatsApp a 10 dígitos.'); form.telefono.focus(); return; }
+    if(calle.length < 4){ showError('Escribe tu calle y número.'); form.calle.focus(); return; }
+    if(cp.length !== 5){ showError('Escribe tu código postal de 5 dígitos.'); inpCp.focus(); return; }
+    if(!selEstado.value){ showError('Elige tu estado.'); return; }
     if(selEstado.value === 'Ciudad de México' && !selAlc.value){ showError('Elige tu alcaldía.'); return; }
+    if(selEstado.value !== 'Ciudad de México' && mun.length < 3){ showError('Escribe tu municipio.'); inpMun.focus(); return; }
     if(colonia.length < 3){ showError('Escribe tu colonia.'); inpCol.focus(); return; }
     if(desc.length < 10){ showError('Cuéntanos un poco más de lo que pasó.'); form.descripcion.focus(); return; }
     if(!document.getElementById('f-ok').checked){ showError('Marca la casilla para que podamos contactarte.'); return; }
@@ -1166,8 +1200,11 @@
     body.set('telefono', tel);
     body.set('categoria', form.categoria.value);
     body.set('urgencia', form.urgencia.value);
+    body.set('calle', calle);
+    body.set('cp', cp);
     body.set('estado', selEstado.value);
     body.set('alcaldia', selEstado.value === 'Ciudad de México' ? selAlc.value : '');
+    body.set('municipio', selEstado.value === 'Ciudad de México' ? '' : mun);
     body.set('colonia', colonia);
     body.set('descripcion', desc);
     body.set('web', form.web.value);
@@ -1185,6 +1222,7 @@
         if(res && res.fuera_de_zona){
           form.style.display = 'none';
           var fz = document.getElementById('fz-ok'); fz.style.display = 'block'; fz.className = 'req-ok show';
+          if(res.error){ var fp = fz.querySelector('p'); if(fp) fp.textContent = res.error; }
           fz.scrollIntoView({behavior:'smooth', block:'center'});
           throw new Error('fuera');
         }
