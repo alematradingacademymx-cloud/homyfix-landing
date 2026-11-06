@@ -596,6 +596,11 @@ document.documentElement.setAttribute("data-theme",t);})();
   :root[data-theme="dark"] .foot-brand .logo-l{display:none;}
   :root[data-theme="dark"] .foot-brand .logo-d{display:block;}
 
+  .pay-box{margin-top:18px;padding:18px 20px;border-radius:18px;background:var(--glass);border:1px solid var(--glass-b);box-shadow:var(--shadow);backdrop-filter:blur(14px);}
+  .pay-box h4{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;margin:0 0 10px;color:var(--navy-deep);}
+  .pay-box ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;font-size:.9rem;color:var(--ink);}
+  .pay-box li{padding-left:18px;position:relative;}
+  .pay-box li::before{content:"";position:absolute;left:0;top:.55em;width:7px;height:7px;border-radius:50%;background:var(--orange);}
   @media (max-width:980px){ .nav-links{display:none;} .nav-inner{gap:10px;} }
   @media (max-width:560px){ .nav{top:8px;padding:0 8px;} .nav-inner{padding:7px 8px 7px 12px;} .brand span{display:none;} .nav-ctas .btn{padding:8px 11px;font-size:.78rem;} }
   @media (prefers-reduced-motion:reduce){ *{transition:none !important;scroll-behavior:auto !important;} }
@@ -664,8 +669,8 @@ document.documentElement.setAttribute("data-theme",t);})();
           <span>cobro correcto y trabajo limpio, verificados por el cliente</span>
         </div>
         <div class="hero-stat">
-          <b>$150 MXN / mes</b>
-          <span>cuota del técnico por pertenecer a la red</span>
+          <b>$300 MXN / mes</b>
+          <span>cuota del técnico, con 14 días gratis desde su primer trabajo</span>
         </div>
       </div>
     </div>
@@ -980,7 +985,7 @@ document.documentElement.setAttribute("data-theme",t);})();
             <div class="step">
               <div class="step-num">4</div>
               <h4>Cobra el trabajo y mantiene su membresía</h4>
-              <p>$150 MXN al mes para seguir activo en la red — su historial de calificaciones es lo que le trae más trabajo.</p>
+              <p>Tiene 14 días gratis desde su primer trabajo confirmado; después, $300 MXN al mes para seguir activo en la red. Su historial de calificaciones es lo que le trae más trabajo.</p>
             </div>
           </div>
         </div>
@@ -1046,10 +1051,11 @@ document.documentElement.setAttribute("data-theme",t);})();
         <div class="card-id-bottom">
           <div class="price-row">
             <span class="cur">$</span>
-            <span class="num">150</span>
+            <span class="num">300</span>
             <span class="per">MXN&nbsp;/&nbsp;mes</span>
           </div>
           <ul class="includes">
+            <li><span class="mk">＋</span> 14 días gratis, que empiezan con tu primer trabajo</li>
             <li><span class="mk">＋</span> Acceso a solicitudes de clientes en tu zona</li>
             <li><span class="mk">＋</span> Perfil verificado con INE y antecedentes</li>
             <li><span class="mk">＋</span> Historial de calificaciones que te trae más trabajo</li>
@@ -1060,8 +1066,17 @@ document.documentElement.setAttribute("data-theme",t);})();
       <div class="membership-copy">
         <span class="eyebrow">Cuota mensual</span>
         <h2>Una membresía simple, para técnicos que sí quieren que se les note lo profesionales que son.</h2>
-        <p>$150 MXN al mes le dan al técnico un lugar en una red donde su buen trabajo y sus buenas referencias sí cuentan — y al cliente, la certeza de que no está dejando entrar a un desconocido a su casa.</p>
+        <p>$300 MXN al mes le dan al técnico un lugar en una red donde su buen trabajo y sus buenas referencias sí cuentan — y al cliente, la certeza de que no está dejando entrar a un desconocido a su casa.</p>
         <div class="note">La cuota se cobra directo por Homyfix; el técnico opera de forma independiente bajo el contrato de intermediación mercantil.</div>
+        <div class="pay-box">
+          <h4>Cuánto pagas y cómo ganas</h4>
+          <ul>
+            <li><b>Registro sin papeleo fiscal.</b> No pedimos constancia fiscal ni carátula bancaria: con tu INE, antecedentes y comprobante de domicilio entras a revisión.</li>
+            <li><b>Cuota clara:</b> $300 al mes por pertenecer a la red.</li>
+            <li><b>14 días gratis desde tu primer trabajo.</b> Hasta que un cliente acepte tu primer servicio, no pagas nada.</li>
+            <li><b>Tú cobras tu trabajo completo</b> directo al cliente, al precio que cotizaste y el cliente aceptó.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
